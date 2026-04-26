@@ -1,0 +1,107 @@
+package com.campus.recruitment.portal.controller;
+
+import com.campus.recruitment.portal.model.*;
+import com.campus.recruitment.portal.repository.*;
+import com.campus.recruitment.portal.service.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.List;
+
+@Controller
+@RequestMapping("/admin")
+public class AdminController {
+
+    @Autowired private UserService userService;
+    @Autowired private UserRepository userRepository;
+    @Autowired private JobRepository jobRepository;
+    @Autowired private ApplicationRepository applicationRepository;
+    @Autowired private InterviewRepository interviewRepository;
+    @Autowired private NotificationService notificationService;
+
+    private User getCurrentUser(Authentication auth) {
+        return userService.findByEmail(auth.getName()).orElseThrow();
+    }
+
+    @GetMapping("/dashboard")
+    public String dashboard(Authentication auth, Model model) {
+        User admin = getCurrentUser(auth);
+        long totalStudents = userRepository.findByRole(User.Role.STUDENT).size();
+        long totalEmployers = userRepository.findByRole(User.Role.EMPLOYER).size();
+        long pendingEmployers = userService.getPendingEmployers().size();
+        long totalJobs = jobRepository.count();
+        long activeJobs = jobRepository.countByStatus(Job.JobStatus.ACTIVE);
+        long totalApplications = applicationRepository.count();
+        long hiredCount = applicationRepository.countByStatus(Application.ApplicationStatus.SELECTED);
+
+        model.addAttribute("admin", admin);
+        model.addAttribute("totalStudents", totalStudents);
+        model.addAttribute("totalEmployers", totalEmployers);
+        model.addAttribute("pendingEmployers", pendingEmployers);
+        model.addAttribute("totalJobs", totalJobs);
+        model.addAttribute("activeJobs", activeJobs);
+        model.addAttribute("totalApplications", totalApplications);
+        model.addAttribute("hiredCount", hiredCount);
+        model.addAttribute("pendingEmployersList", userService.getPendingEmployers());
+        model.addAttribute("recentJobs", jobRepository.findAll().stream().limit(5).toList());
+        model.addAttribute("unreadCount", notificationService.getUnreadCount(admin));
+        return "admin/dashboard";
+    }
+
+    @GetMapping("/users")
+    public String allUsers(Authentication auth, Model model,
+                           @RequestParam(defaultValue = "ALL") String role) {
+        User admin = getCurrentUser(auth);
+        List<User> users;
+        if ("STUDENT".equals(role)) users = userRepository.findByRole(User.Role.STUDENT);
+        else if ("EMPLOYER".equals(role)) users = userRepository.findByRole(User.Role.EMPLOYER);
+        else users = userRepository.findAll();
+
+        model.addAttribute("admin", admin);
+        model.addAttribute("users", users);
+        model.addAttribute("selectedRole", role);
+        model.addAttribute("unreadCount", notificationService.getUnreadCount(admin));
+        return "admin/users";
+    }
+
+    @PostMapping("/users/{id}/approve")
+    public String approveUser(@PathVariable Long id, RedirectAttributes ra) {
+        userService.approveEmployer(id);
+        ra.addFlashAttribute("success", "Employer approved successfully.");
+        return "redirect:/admin/users?role=EMPLOYER";
+    }
+
+    @PostMapping("/users/{id}/reject")
+    public String rejectUser(@PathVariable Long id, RedirectAttributes ra) {
+        userService.rejectUser(id);
+        ra.addFlashAttribute("success", "User account disabled.");
+        return "redirect:/admin/users";
+    }
+
+    @PostMapping("/users/{id}/delete")
+    public String deleteUser(@PathVariable Long id, RedirectAttributes ra) {
+        userRepository.deleteById(id);
+        ra.addFlashAttribute("success", "User deleted.");
+        return "redirect:/admin/users";
+    }
+
+    @GetMapping("/jobs")
+    public String allJobs(Authentication auth, Model model) {
+        User admin = getCurrentUser(auth);
+        model.addAttribute("admin", admin);
+        model.addAttribute("jobs", jobRepository.findAll());
+        model.addAttribute("unreadCount", notificationService.getUnreadCount(admin));
+        return "admin/jobs";
+    }
+
+    @PostMapping("/jobs/{id}/delete")
+    public String deleteJob(@PathVariable Long id, RedirectAttributes ra) {
+        jobRepository.deleteById(id);
+        ra.addFlashAttribute("success", "Job removed.");
+        return "redirect:/admin/jobs";
+    }
+}
