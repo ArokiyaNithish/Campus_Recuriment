@@ -218,4 +218,31 @@ public class AuthController {
     public String accessDenied() {
         return "auth/access-denied";
     }
+
+    @GetMapping("/test-email")
+    @ResponseBody
+    public String testEmail(@RequestParam String to) {
+        try {
+            org.springframework.mail.javamail.JavaMailSender mailSender = 
+                org.springframework.web.context.support.WebApplicationContextUtils
+                .getWebApplicationContext(session.getServletContext())
+                .getBean(org.springframework.mail.javamail.JavaMailSender.class);
+                
+            jakarta.mail.internet.MimeMessage message = mailSender.createMimeMessage();
+            org.springframework.mail.javamail.MimeMessageHelper helper = new org.springframework.mail.javamail.MimeMessageHelper(message, true, "UTF-8");
+            helper.setFrom(System.getenv("MAIL_USERNAME") != null ? System.getenv("MAIL_USERNAME") : "test@example.com");
+            helper.setTo(to);
+            helper.setSubject("Test Email");
+            helper.setText("This is a test email.", true);
+            mailSender.send(message);
+            return "SUCCESS: Email sent successfully to " + to;
+        } catch (Exception e) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("ERROR: ").append(e.getMessage()).append("<br><br>");
+            for (StackTraceElement element : e.getStackTrace()) {
+                sb.append(element.toString()).append("<br>");
+            }
+            return sb.toString();
+        }
+    }
 }
