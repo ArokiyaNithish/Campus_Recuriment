@@ -14,12 +14,16 @@ public class EmailService {
     @Autowired(required = false)
     private JavaMailSender mailSender;
 
+    @org.springframework.beans.factory.annotation.Value("${spring.mail.username}")
+    private String fromEmail;
+
     @Async
     public void sendEmail(String to, String subject, String htmlBody) {
         if (mailSender == null) return;
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setFrom(fromEmail, "Campus Recruitment Portal");
             helper.setTo(to);
             helper.setSubject(subject);
             helper.setText(htmlBody, true);
