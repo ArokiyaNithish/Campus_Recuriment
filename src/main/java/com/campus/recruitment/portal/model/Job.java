@@ -25,10 +25,10 @@ public class Job {
     private String title;
 
     @NotNull
-    @Column(columnDefinition = "NVARCHAR(MAX)")
+    @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(columnDefinition = "NVARCHAR(MAX)")
+    @Column(columnDefinition = "TEXT")
     private String skillsRequired;
 
     private String location;
@@ -44,8 +44,8 @@ public class Job {
     @Enumerated(EnumType.STRING)
     private JobStatus status = JobStatus.ACTIVE;
 
-    @Column(columnDefinition = "NVARCHAR(MAX)")
-    private String youtubeVideoUrl; // AI-suggested related YouTube video
+    @Column(columnDefinition = "TEXT")
+    private String youtubeVideoUrl;
 
     @ManyToOne
     @JoinColumn(name = "employer_id", nullable = false)

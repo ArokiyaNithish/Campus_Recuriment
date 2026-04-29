@@ -122,13 +122,40 @@
 </div>
 
 <div class="card fade-up fade-up-4">
+  <div class="card-title" style="margin-bottom:14px;">📅 Recruitment Calendar</div>
+  <div id="calendar" style="min-height:500px; background:#fff; padding:15px; border-radius:12px;"></div>
+</div>
+
+<div class="card fade-up fade-up-5">
   <div class="card-title" style="margin-bottom:14px;">⚡ Quick Actions</div>
-  <div style="display:flex;flex-wrap:wrap;gap:10px;">
+  <div style="display:flex;flex-wrap:wrap;gap:10px;" class="quick-actions-wrap">
     <a th:href="@{/student/jobs}"         class="btn btn-primary">💼 Browse Jobs</a>
     <a th:href="@{/student/profile}"      class="btn btn-outline">👤 Update Profile</a>
     <a th:href="@{/student/applications}" class="btn btn-outline">📋 My Applications</a>
   </div>
 </div>
+
+<!-- FullCalendar -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        const calendarEl = document.getElementById('calendar');
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            themeSystem: 'standard',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek'
+            },
+            events: [[${calendarEvents}]],
+            eventClick: function(info) {
+                alert(info.event.title);
+            }
+        });
+        calendar.render();
+    });
+</script>
 </main>
 </body>
 </html>

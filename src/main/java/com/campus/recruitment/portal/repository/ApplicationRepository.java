@@ -18,6 +18,7 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
     List<Application> findByStudentAndStatus(User student, Application.ApplicationStatus status);
     Optional<Application> findByStudentAndJob(User student, Job job);
     boolean existsByStudentAndJob(User student, Job job);
+    List<Application> findByStatus(Application.ApplicationStatus status);
 
     @Query("SELECT a FROM Application a WHERE a.job.employer = :employer ORDER BY a.appliedAt DESC")
     List<Application> findByEmployer(@Param("employer") User employer);

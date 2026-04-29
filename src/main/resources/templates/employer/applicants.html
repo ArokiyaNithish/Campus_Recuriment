@@ -19,6 +19,7 @@
       </div>
     </div>
     <div style="display:flex;gap:8px;">
+      <a th:href="@{'/employer/jobs/' + ${job.id} + '/assessment'}" class="btn btn-sm" th:classappend="${hasAssessment} ? 'btn-primary' : 'btn-outline'">📝 Assessment</a>
       <a th:href="@{'/employer/jobs/' + ${job.id} + '/edit'}" class="btn btn-outline btn-sm">✏️ Edit Job</a>
       <a th:href="@{/employer/jobs}" class="btn btn-outline btn-sm">← Back</a>
     </div>
@@ -46,20 +47,18 @@
       </thead>
       <tbody>
         <tr th:each="app : ${applications}" th:id="'row-' + ${app.id}">
-          <td>
+          <td data-label="Candidate">
             <div style="font-weight:600;" th:text="${app.student.fullName}">Name</div>
             <div style="font-size:12px;color:var(--text-muted);" th:text="${app.student.email}">Email</div>
             <div style="font-size:12px;color:var(--text-muted);" th:text="${app.student.phone}"></div>
           </td>
 
           <!-- AI Score Bar -->
-          <td>
+          <td data-label="AI Match">
             <div th:if="${app.aiMatchScore != null}" style="display:flex;align-items:center;gap:8px;min-width:110px;">
               <div class="progress-bar-wrap" style="width:60px;">
                 <div class="progress-bar"
-                     th:style="'width:' + ${app.aiMatchScore} + '%'"
-                     th:styleappend="${app.aiMatchScore >= 70} ? 'background:var(--success)' :
-                                     (${app.aiMatchScore >= 40} ? 'background:var(--warn)' : 'background:var(--danger)')"></div>
+                     th:style="'width:' + ${app.aiMatchScore} + '%;' + (${app.aiMatchScore >= 70} ? 'background:var(--success)' : (${app.aiMatchScore >= 40} ? 'background:var(--warn)' : 'background:var(--danger)'))"></div>
               </div>
               <span style="font-size:13px;font-weight:700;"
                     th:style="${app.aiMatchScore >= 70} ? 'color:var(--success)' :
@@ -69,9 +68,9 @@
             <span th:if="${app.aiMatchScore == null}" style="color:var(--text-muted);font-size:12px;">—</span>
           </td>
 
-          <td style="font-size:12px;" th:text="${#temporals.format(app.appliedAt,'dd MMM yyyy')}"></td>
+          <td data-label="Applied On" style="font-size:12px;" th:text="${app.appliedAt != null ? #temporals.format(app.appliedAt,'dd MMM yyyy') : 'N/A'}"></td>
 
-          <td>
+          <td data-label="Status">
             <span class="badge"
                   th:classappend="${app.status.name() == 'PENDING'} ? 'badge-pending' :
                                   (${app.status.name() == 'SHORTLISTED'} ? 'badge-shortlisted' :
@@ -81,7 +80,7 @@
                   th:text="${app.status.name().replace('_',' ')}">Status</span>
           </td>
 
-          <td>
+          <td data-label="Actions">
             <div style="display:flex;gap:6px;flex-wrap:wrap;">
               <!-- Update Status -->
               <button class="btn btn-primary btn-xs"
@@ -103,6 +102,18 @@
                       onclick="showCoverLetter(this.getAttribute('data-letter'))">
                 📄 Letter
               </button>
+              <!-- View Details -->
+              <button class="btn btn-outline btn-xs"
+                      th:with="prof=${studentProfiles.get(app.student.id)}"
+                      th:attr="data-dept=${prof != null ? prof.department : 'N/A'},
+                               data-degree=${prof != null ? prof.degree : 'N/A'},
+                               data-year=${prof != null ? prof.year : 'N/A'},
+                               data-cgpa=${prof != null ? prof.cgpa : 'N/A'},
+                               data-skills=${prof != null ? prof.skills : 'N/A'},
+                               data-resume=${prof != null and prof.resumePath != null ? '/uploads/' + prof.resumePath : ''}"
+                      onclick="openProfileModal(this)">
+                👁️ View Details
+              </button>
             </div>
           </td>
         </tr>
@@ -112,7 +123,7 @@
 </div>
 
 <!-- ── Status Update Modal ──────────────────────────────────────── -->
-<div id="statusModal" style="display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;" class="modal-overlay">
+<div id="statusModal" style="display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.7);align-items:center;justify-content:center;" class="modal-overlay">
   <div class="card" style="width:400px;max-width:90vw;margin:0;">
     <div class="card-header">
       <div class="card-title">✏️ Update Application Status</div>
@@ -199,11 +210,33 @@
   </div>
 </div>
 
+<!-- ── Profile Modal ──────────────────────────────────────── -->
+<div id="profileModal" style="display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.7);" class="modal-overlay">
+  <div style="display:flex;align-items:center;justify-content:center;height:100%;">
+    <div class="card" style="width:500px;max-width:90vw;margin:0;">
+      <div class="card-header">
+        <div class="card-title">👤 Student Profile</div>
+        <button onclick="closeModal('profileModal')" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer;">✕</button>
+      </div>
+      <table style="width:100%; font-size:14px;">
+        <tr><td style="padding:8px;font-weight:600;width:40%;">Department:</td><td id="p_dept" style="padding:8px;"></td></tr>
+        <tr><td style="padding:8px;font-weight:600;">Degree:</td><td id="p_degree" style="padding:8px;"></td></tr>
+        <tr><td style="padding:8px;font-weight:600;">Grad Year:</td><td id="p_year" style="padding:8px;"></td></tr>
+        <tr><td style="padding:8px;font-weight:600;">CGPA:</td><td id="p_cgpa" style="padding:8px;"></td></tr>
+        <tr><td style="padding:8px;font-weight:600;">Skills:</td><td id="p_skills" style="padding:8px;"></td></tr>
+        <tr><td style="padding:8px;font-weight:600;">Resume:</td><td style="padding:8px;"><a id="p_resume" href="#" target="_blank" class="btn btn-outline btn-xs">📄 View Resume</a></td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
 <script>
   function openStatusModal(appId, currentStatus) {
     console.log('Opening status modal for ID:', appId);
     var modal = document.getElementById('statusModal');
     modal.style.display = 'flex';
+    modal.style.alignItems = 'center';
+    modal.style.justifyContent = 'center';
     var input = document.getElementById('statusAppId');
     if (input) {
       input.value = appId;
@@ -228,6 +261,22 @@
   }
   function closeModal(id) {
     document.getElementById(id).style.display = 'none';
+  }
+  function openProfileModal(btn) {
+    document.getElementById('p_dept').textContent = btn.getAttribute('data-dept') && btn.getAttribute('data-dept') !== 'null' ? btn.getAttribute('data-dept') : 'N/A';
+    document.getElementById('p_degree').textContent = btn.getAttribute('data-degree') && btn.getAttribute('data-degree') !== 'null' ? btn.getAttribute('data-degree') : 'N/A';
+    document.getElementById('p_year').textContent = btn.getAttribute('data-year') && btn.getAttribute('data-year') !== 'null' ? btn.getAttribute('data-year') : 'N/A';
+    document.getElementById('p_cgpa').textContent = btn.getAttribute('data-cgpa') && btn.getAttribute('data-cgpa') !== 'null' ? btn.getAttribute('data-cgpa') : 'N/A';
+    document.getElementById('p_skills').textContent = btn.getAttribute('data-skills') && btn.getAttribute('data-skills') !== 'null' ? btn.getAttribute('data-skills') : 'N/A';
+    var resumeUrl = btn.getAttribute('data-resume');
+    var resLink = document.getElementById('p_resume');
+    if (resumeUrl && resumeUrl !== 'null') {
+      resLink.href = resumeUrl;
+      resLink.style.display = 'inline-block';
+    } else {
+      resLink.style.display = 'none';
+    }
+    document.getElementById('profileModal').style.display = 'block';
   }
   // Close modals on background click
   document.querySelectorAll('.modal-overlay').forEach(el => {

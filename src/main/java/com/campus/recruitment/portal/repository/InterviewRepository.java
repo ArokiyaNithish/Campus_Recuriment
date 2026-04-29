@@ -13,6 +13,9 @@ import java.util.Optional;
 @Repository
 public interface InterviewRepository extends JpaRepository<Interview, Long> {
     Optional<Interview> findByApplicationId(Long applicationId);
+    
+    @Query("SELECT i FROM Interview i WHERE i.status = :status AND (i.reminderSent = false OR i.reminderSent IS NULL)")
+    List<Interview> findUpcomingReminders(@Param("status") Interview.InterviewStatus status);
 
     @Query("SELECT i FROM Interview i WHERE i.application.student = :student ORDER BY i.interviewDate ASC")
     List<Interview> findByStudent(@Param("student") com.campus.recruitment.portal.model.User student);

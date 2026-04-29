@@ -19,13 +19,13 @@
     <!-- ══ Sidebar ══════════════════════════════════════════════════ -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-brand">
-        <div class="brand-icon">🎓</div>
-        <span>Campus Recruit<small></small></span>
+        <div class="brand-icon">✨</div>
+        <span style="color: var(--primary);">Campus Recruit<small style="color: var(--text-muted);">✨ Premium Portal ✨</small></span>
       </div>
 
       <!-- STUDENT NAV -->
       <div th:if="${#authorization.expression('hasRole(''STUDENT'')')}" class="sidebar-section">
-        <div class="sidebar-section-label">Student</div>
+        <div class="sidebar-section-label">🌟 Student Hub</div>
         <nav>
           <a th:href="@{/student/dashboard}" th:classappend="${activePage == 'dashboard'} ? 'active'">
             <span class="nav-icon">🏠</span> Dashboard
@@ -45,7 +45,7 @@
 
       <!-- EMPLOYER NAV -->
       <div th:if="${#authorization.expression('hasRole(''EMPLOYER'')')}" class="sidebar-section">
-        <div class="sidebar-section-label">Employer</div>
+        <div class="sidebar-section-label">🏢 Employer Suite</div>
         <nav>
           <a th:href="@{/employer/dashboard}" th:classappend="${activePage == 'dashboard'} ? 'active'">
             <span class="nav-icon">🏠</span> Dashboard
@@ -61,7 +61,7 @@
 
       <!-- ADMIN NAV -->
       <div th:if="${#authorization.expression('hasRole(''ADMIN'')')}" class="sidebar-section">
-        <div class="sidebar-section-label">Admin</div>
+        <div class="sidebar-section-label">🛡️ Admin Control</div>
         <nav>
           <a th:href="@{/admin/dashboard}" th:classappend="${activePage == 'dashboard'} ? 'active'">
             <span class="nav-icon">🏠</span> Dashboard
@@ -71,6 +71,9 @@
           </a>
           <a th:href="@{/admin/jobs}" th:classappend="${activePage == 'jobs'} ? 'active'">
             <span class="nav-icon">💼</span> All Jobs
+          </a>
+          <a th:href="@{/admin/applications}" th:classappend="${activePage == 'applications'} ? 'active'">
+            <span class="nav-icon">📋</span> Applications
           </a>
         </nav>
       </div>
@@ -98,9 +101,46 @@
         <button onclick="toggleSidebar()" id="menu-btn">☰</button>
         <div>
           <div class="topbar-title" th:text="${pageTitle ?: 'Dashboard'}">Dashboard</div>
-          <div class="topbar-subtitle" th:text="${pageSubtitle ?: ''}"></div>
+          <div class="topbar-subtitle"><span style="color: var(--accent);">●</span> <span th:text="${pageSubtitle ?: 'Welcome back! 👋'}">Welcome back!</span></div>
         </div>
         <div style="margin-left:auto;display:flex;align-items:center;gap:12px;">
+          <!-- Timer section -->
+          <div th:if="${session.loginTime != null}" class="session-timer-box" style="display:flex; flex-direction:column; align-items:flex-end; font-size:12px; color:var(--text-muted); background:var(--bg-card); padding:4px 10px; border-radius:6px; border:1px solid var(--border-color); margin-right:10px; box-shadow:0 2px 4px rgba(0,0,0,0.02);">
+            <div>Login Time: <span style="font-weight:600;color:var(--text);" th:text="${#temporals.format(session.loginTime, 'dd MMM, HH:mm')}"></span></div>
+            <div>Session Expires In: <span id="sessionTimer" style="font-weight:700;color:var(--danger);" th:data-endtime="${session.sessionEndTime}">10m 00s</span></div>
+          </div>
+          
+          <script>
+            const timerEl = document.getElementById('sessionTimer');
+            if (timerEl) {
+                const endTimeStr = timerEl.getAttribute('data-endtime');
+                if (endTimeStr) {
+                    const endTime = new Date(endTimeStr).getTime();
+                    const interval = setInterval(() => {
+                        const now = new Date().getTime();
+                        const distance = endTime - now;
+                        
+                        if (distance < 0) {
+                            clearInterval(interval);
+                            timerEl.innerText = "00m 00s";
+                            // Redirect to logout programmatically
+                            const form = document.createElement('form');
+                            form.method = 'post';
+                            form.action = '/auth/logout';
+                            const csrf = document.querySelector('input[name="_csrf"]');
+                            if(csrf) form.appendChild(csrf.cloneNode());
+                            document.body.appendChild(form);
+                            form.submit();
+                        } else {
+                            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                            timerEl.innerText = minutes + "m " + (seconds < 10 ? "0" : "") + seconds + "s";
+                        }
+                    }, 1000);
+                }
+            }
+          </script>
+
           <div class="notif-bell" id="notifBell" onclick="toggleNotifDropdown(event)">
             🔔
             <span class="notif-badge" th:if="${unreadCount > 0}" th:text="${unreadCount}"></span>

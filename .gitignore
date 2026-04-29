@@ -1,2 +1,10 @@
 target/
 *.jar
+*.class
+*.log
+.idea/
+*.iml
+uploads/
+boot*.log
+mssql-jdbc_auth-*.dll
+android-apk/

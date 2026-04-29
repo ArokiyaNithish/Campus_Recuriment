@@ -49,6 +49,17 @@ public class AdminController {
         model.addAttribute("pendingEmployersList", userService.getPendingEmployers());
         model.addAttribute("recentJobs", jobRepository.findAll().stream().limit(5).toList());
         model.addAttribute("unreadCount", notificationService.getUnreadCount(admin));
+
+        // Chart Data
+        model.addAttribute("jobStatus_ACTIVE", jobRepository.countByStatus(Job.JobStatus.ACTIVE));
+        model.addAttribute("jobStatus_CLOSED", jobRepository.countByStatus(Job.JobStatus.CLOSED));
+        model.addAttribute("jobStatus_DRAFT", jobRepository.countByStatus(Job.JobStatus.DRAFT));
+
+        model.addAttribute("appStatus_PENDING", applicationRepository.countByStatus(Application.ApplicationStatus.PENDING));
+        model.addAttribute("appStatus_SHORTLISTED", applicationRepository.countByStatus(Application.ApplicationStatus.SHORTLISTED));
+        model.addAttribute("appStatus_SELECTED", applicationRepository.countByStatus(Application.ApplicationStatus.SELECTED));
+        model.addAttribute("appStatus_REJECTED", applicationRepository.countByStatus(Application.ApplicationStatus.REJECTED));
+
         return "admin/dashboard";
     }
 
@@ -103,5 +114,45 @@ public class AdminController {
         jobRepository.deleteById(id);
         ra.addFlashAttribute("success", "Job removed.");
         return "redirect:/admin/jobs";
+    }
+
+    @GetMapping("/applications")
+    public String allApplications(Authentication auth, Model model,
+                                  @RequestParam(required = false) String status,
+                                  @RequestParam(required = false) Long companyId) {
+        User admin = getCurrentUser(auth);
+        List<Application> applications;
+        
+        boolean hasStatus = status != null && !status.equals("ALL");
+        boolean hasCompany = companyId != null && companyId > 0;
+        
+        if (hasCompany) {
+            User employer = userRepository.findById(companyId).orElse(null);
+            if (employer != null) {
+                if (hasStatus) {
+                    applications = applicationRepository.findByEmployerAndStatus(employer, Application.ApplicationStatus.valueOf(status));
+                } else {
+                    applications = applicationRepository.findByEmployer(employer);
+                }
+            } else {
+                applications = List.of();
+            }
+        } else {
+            if (hasStatus) {
+                applications = applicationRepository.findByStatus(Application.ApplicationStatus.valueOf(status));
+            } else {
+                applications = applicationRepository.findAll();
+            }
+        }
+
+        List<User> employers = userRepository.findByRole(User.Role.EMPLOYER);
+        model.addAttribute("employers", employers);
+        model.addAttribute("selectedCompanyId", companyId);
+
+        model.addAttribute("admin", admin);
+        model.addAttribute("applications", applications);
+        model.addAttribute("selectedStatus", status != null ? status : "ALL");
+        model.addAttribute("unreadCount", notificationService.getUnreadCount(admin));
+        return "admin/applications";
     }
 }

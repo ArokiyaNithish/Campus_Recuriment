@@ -27,12 +27,14 @@ public class Application {
     @Enumerated(EnumType.STRING)
     private ApplicationStatus status = ApplicationStatus.PENDING;
 
-    @Column(columnDefinition = "NVARCHAR(MAX)")
+    @Column(columnDefinition = "TEXT")
     private String coverLetter;
 
     private Double aiMatchScore; // AI-computed match percentage
 
-    @Column(columnDefinition = "NVARCHAR(MAX)")
+    private Integer assessmentScore; // Out of 5
+
+    @Column(columnDefinition = "TEXT")
     private String employerNotes;
 
     @Column(updatable = false)

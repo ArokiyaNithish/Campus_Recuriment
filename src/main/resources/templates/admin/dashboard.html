@@ -96,31 +96,80 @@
 
 <!-- System Stats Card -->
 <div class="card fade-up fade-up-3">
-  <div class="card-title" style="margin-bottom:16px;">📊 Recruitment Funnel</div>
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:16px;">
-    <div style="text-align:center;padding:16px;background:var(--bg3);border-radius:10px;">
-      <div style="font-size:28px;font-weight:800;color:var(--primary);" th:text="${totalStudents}">0</div>
-      <div style="font-size:12px;color:var(--text-muted);">Registered Students</div>
+  <div class="card-title" style="margin-bottom:16px;">📊 Recruitment Analytics</div>
+  <div class="grid-2" style="gap:20px;">
+    <div style="min-height:300px; display:flex; flex-direction:column; align-items:center;">
+        <div style="font-size:14px; font-weight:600; margin-bottom:10px;">User Distribution</div>
+        <canvas id="userDistChart"></canvas>
     </div>
-    <div style="text-align:center;padding:16px;background:var(--bg3);border-radius:10px;">
-      <div style="font-size:28px;font-weight:800;color:var(--accent);" th:text="${totalJobs}">0</div>
-      <div style="font-size:12px;color:var(--text-muted);">Total Jobs</div>
-    </div>
-    <div style="text-align:center;padding:16px;background:var(--bg3);border-radius:10px;">
-      <div style="font-size:28px;font-weight:800;color:var(--warn);" th:text="${totalApplications}">0</div>
-      <div style="font-size:12px;color:var(--text-muted);">Applications</div>
-    </div>
-    <div style="text-align:center;padding:16px;background:var(--bg3);border-radius:10px;">
-      <div style="font-size:28px;font-weight:800;color:var(--success);" th:text="${hiredCount}">0</div>
-      <div style="font-size:12px;color:var(--text-muted);">Students Hired</div>
-    </div>
-    <div style="text-align:center;padding:16px;background:var(--bg3);border-radius:10px;" th:if="${totalApplications > 0}">
-      <div style="font-size:28px;font-weight:800;color:var(--danger);"
-           th:text="${#numbers.formatDecimal(hiredCount * 100.0 / totalApplications, 1, 1)} + '%'">0%</div>
-      <div style="font-size:12px;color:var(--text-muted);">Conversion Rate</div>
+    <div style="min-height:300px; display:flex; flex-direction:column; align-items:center;">
+        <div style="font-size:14px; font-weight:600; margin-bottom:10px;">Application Funnel</div>
+        <canvas id="appFunnelChart"></canvas>
     </div>
   </div>
 </div>
+
+<div class="card fade-up fade-up-4" style="margin-top:20px;">
+  <div class="card-title" style="margin-bottom:16px;">💼 Job Distribution</div>
+  <div style="max-width:600px; margin:auto;">
+    <canvas id="jobDistChart"></canvas>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        // User Distribution Chart
+        const userCtx = document.getElementById('userDistChart').getContext('2d');
+        new Chart(userCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Students', 'Employers'],
+                datasets: [{
+                    data: [ [[${totalStudents}]], [[${totalEmployers}]] ],
+                    backgroundColor: ['#6c63ff', '#00d4aa'],
+                    borderWidth: 0
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+
+        // Application Funnel Chart
+        const appCtx = document.getElementById('appFunnelChart').getContext('2d');
+        new Chart(appCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Pending', 'Shortlisted', 'Selected', 'Rejected'],
+                datasets: [{
+                    label: 'Applications',
+                    data: [ [[${appStatus_PENDING}]], [[${appStatus_SHORTLISTED}]], [[${appStatus_SELECTED}]], [[${appStatus_REJECTED}]] ],
+                    backgroundColor: ['#f59e0b', '#a78bfa', '#22c55e', '#ef4444'],
+                    borderRadius: 8
+                }]
+            },
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false,
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+
+        // Job Distribution Chart
+        const jobCtx = document.getElementById('jobDistChart').getContext('2d');
+        new Chart(jobCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Active', 'Closed', 'Draft'],
+                datasets: [{
+                    data: [ [[${jobStatus_ACTIVE}]], [[${jobStatus_CLOSED}]], [[${jobStatus_DRAFT}]] ],
+                    backgroundColor: ['#22c55e', '#ef4444', '#94a3b8'],
+                    borderWidth: 0
+                }]
+            },
+            options: { responsive: true }
+        });
+    });
+</script>
 </main>
 </body>
 </html>

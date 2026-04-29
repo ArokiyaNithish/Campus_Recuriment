@@ -24,22 +24,22 @@ public class StudentProfile {
     private String rollNumber;
     private Double cgpa;
 
-    @Column(columnDefinition = "NVARCHAR(MAX)")
+    @Column(columnDefinition = "TEXT")
     private String skills;           // AI-extracted: comma separated
 
-    @Column(columnDefinition = "NVARCHAR(MAX)")
+    @Column(columnDefinition = "TEXT")
     private String technicalSkills;  // AI-extracted
 
-    @Column(columnDefinition = "NVARCHAR(MAX)")
+    @Column(columnDefinition = "TEXT")
     private String projects;         // AI-extracted
 
-    @Column(columnDefinition = "NVARCHAR(MAX)")
+    @Column(columnDefinition = "TEXT")
     private String experience;       // AI-extracted
 
-    @Column(columnDefinition = "NVARCHAR(MAX)")
+    @Column(columnDefinition = "TEXT")
     private String certifications;   // AI-extracted
 
-    @Column(columnDefinition = "NVARCHAR(MAX)")
+    @Column(columnDefinition = "TEXT")
     private String summary;          // AI-generated profile summary
 
     private String resumePath;       // Path to uploaded resume file
@@ -47,6 +47,6 @@ public class StudentProfile {
     private String linkedinUrl;
     private String githubUrl;
 
-    @Column(columnDefinition = "NVARCHAR(MAX)")
+    @Column(columnDefinition = "TEXT")
     private String aiRecommendations; // AI job recommendations
 }

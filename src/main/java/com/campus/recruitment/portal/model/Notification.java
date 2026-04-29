@@ -22,7 +22,7 @@ public class Notification {
 
     private String title;
     
-    @Column(columnDefinition = "NVARCHAR(MAX)")
+    @Column(columnDefinition = "TEXT")
     private String message;
 
     private String link; // Optional link to click from notification

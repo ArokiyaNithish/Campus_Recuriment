@@ -31,8 +31,11 @@ public class Interview {
     @Enumerated(EnumType.STRING)
     private InterviewStatus status = InterviewStatus.SCHEDULED;
 
-    @Column(columnDefinition = "NVARCHAR(MAX)")
+    @Column(columnDefinition = "TEXT")
     private String notes;
+
+    @Column(columnDefinition = "boolean default false")
+    private Boolean reminderSent = false;
 
     public enum InterviewStatus {
         SCHEDULED, COMPLETED, CANCELLED, RESCHEDULED

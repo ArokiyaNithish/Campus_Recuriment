@@ -24,6 +24,8 @@ public class EmployerController {
     @Autowired private InterviewRepository interviewRepository;
     @Autowired private NotificationService notificationService;
     @Autowired private EmailService emailService;
+    @Autowired private AssessmentQuestionRepository assessmentQuestionRepository;
+    @Autowired private StudentProfileRepository studentProfileRepository;
 
     private User getCurrentUser(Authentication auth) {
         return userService.findByEmail(auth.getName()).orElseThrow();
@@ -44,6 +46,7 @@ public class EmployerController {
         model.addAttribute("pendingCount", allApps.stream().filter(a -> a.getStatus() == Application.ApplicationStatus.PENDING).count());
         model.addAttribute("shortlistedCount", allApps.stream().filter(a -> a.getStatus() == Application.ApplicationStatus.SHORTLISTED).count());
         model.addAttribute("selectedCount", allApps.stream().filter(a -> a.getStatus() == Application.ApplicationStatus.SELECTED).count());
+        model.addAttribute("rejectedCount", allApps.stream().filter(a -> a.getStatus() == Application.ApplicationStatus.REJECTED).count());
         model.addAttribute("unreadCount", notificationService.getUnreadCount(employer));
         return "employer/dashboard";
     }
@@ -85,14 +88,22 @@ public class EmployerController {
                           @RequestParam(defaultValue = "ACTIVE") String status,
                           RedirectAttributes ra) {
         User employer = getCurrentUser(auth);
-        Job job = (jobId != null) ? jobRepository.findById(jobId).orElse(new Job()) : new Job();
+        boolean isNewJob = (jobId == null);
+        Job job = isNewJob ? new Job() : jobRepository.findById(jobId).orElse(new Job());
+        
         job.setTitle(title); job.setDescription(description); job.setSkillsRequired(skillsRequired);
         job.setLocation(location); job.setCategory(category); job.setExperienceLevel(experienceLevel);
         job.setSalaryRange(salaryRange); job.setOpenings(openings); job.setMinCgpa(minCgpa);
         job.setEligibleDepartments(eligibleDepartments); job.setStatus(Job.JobStatus.valueOf(status));
         job.setEmployer(employer);
         if (deadline != null && !deadline.isBlank()) job.setDeadline(LocalDate.parse(deadline).atStartOfDay());
+        
         jobRepository.save(job);
+        
+        if (isNewJob) {
+            notificationService.sendJobAlertToAllStudents(job);
+        }
+        
         ra.addFlashAttribute("success", "Job saved!");
         return "redirect:/employer/jobs";
     }
@@ -121,11 +132,68 @@ public class EmployerController {
     public String jobApplicants(Authentication auth, @PathVariable Long id, Model model) {
         User employer = getCurrentUser(auth);
         Job job = jobRepository.findById(id).orElseThrow();
+        List<Application> applications = applicationRepository.findByEmployerAndJobId(employer, id);
+        
+        java.util.Map<Long, StudentProfile> studentProfiles = new java.util.HashMap<>();
+        for (Application app : applications) {
+            studentProfileRepository.findByUserId(app.getStudent().getId()).ifPresent(profile -> 
+                studentProfiles.put(app.getStudent().getId(), profile)
+            );
+        }
+        
         model.addAttribute("employer", employer);
         model.addAttribute("job", job);
-        model.addAttribute("applications", applicationRepository.findByEmployerAndJobId(employer, id));
+        model.addAttribute("applications", applications);
+        model.addAttribute("studentProfiles", studentProfiles);
         model.addAttribute("unreadCount", notificationService.getUnreadCount(employer));
+        model.addAttribute("hasAssessment", assessmentQuestionRepository.countByJob(job) > 0);
         return "employer/applicants";
+    }
+
+    @GetMapping("/jobs/{id}/assessment")
+    public String jobAssessment(Authentication auth, @PathVariable Long id, Model model) {
+        User employer = getCurrentUser(auth);
+        Job job = jobRepository.findById(id).orElseThrow();
+        List<AssessmentQuestion> questions = assessmentQuestionRepository.findByJob(job);
+        
+        model.addAttribute("employer", employer);
+        model.addAttribute("job", job);
+        model.addAttribute("questions", questions);
+        model.addAttribute("unreadCount", notificationService.getUnreadCount(employer));
+        return "employer/assessment";
+    }
+
+    @PostMapping("/jobs/{id}/assessment")
+    public String saveAssessment(@PathVariable Long id,
+                                 @RequestParam List<String> questionText,
+                                 @RequestParam List<String> optionA,
+                                 @RequestParam List<String> optionB,
+                                 @RequestParam List<String> optionC,
+                                 @RequestParam List<String> optionD,
+                                 @RequestParam List<String> correctOption,
+                                 RedirectAttributes ra) {
+        Job job = jobRepository.findById(id).orElseThrow();
+        
+        // Remove existing
+        List<AssessmentQuestion> existing = assessmentQuestionRepository.findByJob(job);
+        assessmentQuestionRepository.deleteAll(existing);
+        
+        for (int i = 0; i < 5; i++) {
+            if (i < questionText.size() && !questionText.get(i).isBlank()) {
+                AssessmentQuestion q = new AssessmentQuestion();
+                q.setJob(job);
+                q.setQuestionText(questionText.get(i));
+                q.setOptionA(optionA.get(i));
+                q.setOptionB(optionB.get(i));
+                q.setOptionC(optionC.get(i));
+                q.setOptionD(optionD.get(i));
+                q.setCorrectOption(correctOption.get(i));
+                assessmentQuestionRepository.save(q);
+            }
+        }
+        
+        ra.addFlashAttribute("success", "Assessment saved successfully.");
+        return "redirect:/employer/jobs/" + id + "/assessment";
     }
 
     @PostMapping("/jobs/{id}/applicants")

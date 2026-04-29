@@ -31,6 +31,7 @@ public class StudentController {
     @Autowired private EmailService emailService;
     @Autowired private GeminiAIService geminiAIService;
     @Autowired private FileStorageService fileStorageService;
+    @Autowired private AssessmentQuestionRepository assessmentQuestionRepository;
 
     private User getCurrentUser(Authentication auth) {
         return userService.findByEmail(auth.getName()).orElseThrow();
@@ -59,6 +60,33 @@ public class StudentController {
         model.addAttribute("pendingCount", pending);
         model.addAttribute("shortlistedCount", shortlisted);
         model.addAttribute("scheduledCount", scheduled);
+
+        // Prepare Calendar Events
+        List<Map<String, Object>> events = new ArrayList<>();
+        for (Application app : applications) {
+            if (app.getStatus() == Application.ApplicationStatus.SHORTLISTED) {
+                Map<String, Object> event = new HashMap<>();
+                event.put("title", "⭐ Shortlisted: " + app.getJob().getTitle());
+                event.put("start", app.getAppliedAt().toLocalDate().toString());
+                event.put("color", "#a78bfa");
+                events.add(event);
+            } else if (app.getStatus() == Application.ApplicationStatus.SELECTED) {
+                Map<String, Object> event = new HashMap<>();
+                event.put("title", "🏆 Selected: " + app.getJob().getTitle());
+                event.put("start", app.getAppliedAt().toLocalDate().toString());
+                event.put("color", "#22c55e");
+                events.add(event);
+            }
+        }
+        for (Interview iv : interviews) {
+            Map<String, Object> event = new HashMap<>();
+            event.put("title", "📅 Interview: " + iv.getApplication().getJob().getTitle());
+            event.put("start", iv.getInterviewDate().toString());
+            event.put("color", "#6c63ff");
+            events.add(event);
+        }
+        model.addAttribute("calendarEvents", events);
+
         return "student/dashboard";
     }
 
@@ -251,6 +279,69 @@ public class StudentController {
         model.addAttribute("interviews", interviews);
         model.addAttribute("unreadCount", notificationService.getUnreadCount(student));
         return "student/applications";
+    }
+
+    @GetMapping("/applications/{id}/assessment")
+    public String takeAssessment(Authentication auth, @PathVariable Long id, Model model, RedirectAttributes ra) {
+        User student = getCurrentUser(auth);
+        Application app = applicationRepository.findById(id).orElseThrow();
+        if (!app.getStudent().getId().equals(student.getId())) return "redirect:/student/applications";
+        
+        if (app.getStatus() != Application.ApplicationStatus.SHORTLISTED) {
+            ra.addFlashAttribute("error", "Assessment is only available for shortlisted applications.");
+            return "redirect:/student/applications";
+        }
+        
+        if (app.getAssessmentScore() != null) {
+            ra.addFlashAttribute("error", "You have already taken this assessment.");
+            return "redirect:/student/applications";
+        }
+        
+        List<AssessmentQuestion> questions = assessmentQuestionRepository.findByJob(app.getJob());
+        if (questions.isEmpty()) {
+            ra.addFlashAttribute("error", "No assessment configured for this job.");
+            return "redirect:/student/applications";
+        }
+        
+        model.addAttribute("student", student);
+        model.addAttribute("application", app);
+        model.addAttribute("questions", questions);
+        model.addAttribute("unreadCount", notificationService.getUnreadCount(student));
+        return "student/assessment";
+    }
+
+    @PostMapping("/applications/{id}/assessment/submit")
+    public String submitAssessment(Authentication auth, @PathVariable Long id, 
+                                   jakarta.servlet.http.HttpServletRequest request, 
+                                   RedirectAttributes ra) {
+        User student = getCurrentUser(auth);
+        Application app = applicationRepository.findById(id).orElseThrow();
+        if (!app.getStudent().getId().equals(student.getId())) return "redirect:/student/applications";
+        
+        List<AssessmentQuestion> questions = assessmentQuestionRepository.findByJob(app.getJob());
+        int score = 0;
+        
+        for (AssessmentQuestion q : questions) {
+            String answer = request.getParameter("q_" + q.getId());
+            if (answer != null && answer.equals(q.getCorrectOption())) {
+                score++;
+            }
+        }
+        
+        app.setAssessmentScore(score);
+        if (score >= 3) {
+            app.setStatus(Application.ApplicationStatus.INTERVIEW_SCHEDULED);
+            app.setEmployerNotes((app.getEmployerNotes() != null ? app.getEmployerNotes() + "\n" : "") + "Passed assessment with score " + score + "/5.");
+            notificationService.sendNotification(student, "Assessment Passed! 🎉", "You scored " + score + "/5. You are automatically moved to the interview round.", "/student/applications");
+        } else {
+            app.setStatus(Application.ApplicationStatus.REJECTED);
+            app.setEmployerNotes((app.getEmployerNotes() != null ? app.getEmployerNotes() + "\n" : "") + "Failed assessment with score " + score + "/5.");
+            notificationService.sendNotification(student, "Assessment Failed", "You scored " + score + "/5. Unfortunately, you did not pass the assessment.", "/student/applications");
+        }
+        applicationRepository.save(app);
+        
+        ra.addFlashAttribute("success", "Assessment submitted successfully. Score: " + score + "/5.");
+        return "redirect:/student/applications";
     }
 
     // ─── Notifications ────────────────────────────────────────────

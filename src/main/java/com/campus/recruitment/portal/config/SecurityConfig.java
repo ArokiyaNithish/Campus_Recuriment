@@ -32,7 +32,7 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/auth/**", "/css/**", "/js/**", "/images/**",
-                                 "/uploads/**", "/error").permitAll()
+                                 "/uploads/**", "/error", "/favicon.ico").permitAll()
                 .requestMatchers("/student/**").hasRole("STUDENT")
                 .requestMatchers("/employer/**").hasRole("EMPLOYER")
                 .requestMatchers("/admin/**").hasRole("ADMIN")
@@ -40,23 +40,9 @@ public class SecurityConfig {
             )
             .formLogin(form -> form
                 .loginPage("/auth/login")
-                .loginProcessingUrl("/auth/login")
+                .loginProcessingUrl("/auth/process-login")
                 .usernameParameter("email")
                 .passwordParameter("password")
-                .successHandler((request, response, authentication) -> {
-                    var authorities = authentication.getAuthorities();
-                    String role = authorities.iterator().next().getAuthority();
-                    if (role.equals("ROLE_STUDENT")) {
-                        response.sendRedirect("/student/dashboard");
-                    } else if (role.equals("ROLE_EMPLOYER")) {
-                        response.sendRedirect("/employer/dashboard");
-                    } else if (role.equals("ROLE_ADMIN")) {
-                        response.sendRedirect("/admin/dashboard");
-                    } else {
-                        response.sendRedirect("/");
-                    }
-                })
-                .failureUrl("/auth/login?error=true")
                 .permitAll()
             )
             .logout(logout -> logout

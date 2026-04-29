@@ -49,6 +49,12 @@ public class User {
     @Column
     private String phone;
 
+    @Column
+    private String otp;
+
+    @Column
+    private LocalDateTime otpExpiry;
+
     @Column(updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
