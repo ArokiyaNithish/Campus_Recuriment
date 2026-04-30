@@ -225,14 +225,15 @@ public class AuthController {
     @ResponseBody
     public String testEmail(@RequestParam String to) {
         try {
-            org.springframework.mail.javamail.JavaMailSender mailSender = 
-                org.springframework.web.context.support.WebApplicationContextUtils
-                .getWebApplicationContext(session.getServletContext())
-                .getBean(org.springframework.mail.javamail.JavaMailSender.class);
+            org.springframework.context.ApplicationContext ctx = org.springframework.web.context.support.WebApplicationContextUtils
+                .getWebApplicationContext(session.getServletContext());
+                
+            org.springframework.mail.javamail.JavaMailSender mailSender = ctx.getBean(org.springframework.mail.javamail.JavaMailSender.class);
+            String from = ctx.getEnvironment().getProperty("app.mail.from", "test@example.com");
                 
             jakarta.mail.internet.MimeMessage message = mailSender.createMimeMessage();
             org.springframework.mail.javamail.MimeMessageHelper helper = new org.springframework.mail.javamail.MimeMessageHelper(message, true, "UTF-8");
-            helper.setFrom(System.getenv("MAIL_USERNAME") != null ? System.getenv("MAIL_USERNAME") : "test@example.com");
+            helper.setFrom(from, "Campus Recruitment Portal");
             helper.setTo(to);
             helper.setSubject("Test Email");
             helper.setText("This is a test email.", true);
