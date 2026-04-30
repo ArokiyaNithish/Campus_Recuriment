@@ -28,6 +28,9 @@ public class AuthController {
     @Autowired
     private jakarta.servlet.http.HttpSession session;
 
+    @Autowired
+    private org.springframework.security.web.context.SecurityContextRepository securityContextRepository;
+
     @GetMapping("/login")
     public String loginPage(@RequestParam(required = false) String error,
                             @RequestParam(required = false) String logout,
@@ -67,11 +70,11 @@ public class AuthController {
                 new com.campus.recruitment.portal.security.CustomUserDetailsService(userRepository).loadUserByUsername(email);
             var auth = new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
                 userDetails, null, userDetails.getAuthorities());
-            org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(auth);
             
-            request.getSession(true).setAttribute(
-                org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, 
-                org.springframework.security.core.context.SecurityContextHolder.getContext());
+            org.springframework.security.core.context.SecurityContext context = org.springframework.security.core.context.SecurityContextHolder.createEmptyContext();
+            context.setAuthentication(auth);
+            org.springframework.security.core.context.SecurityContextHolder.setContext(context);
+            securityContextRepository.saveContext(context, request, response);
             
             // Set session time
             session.setAttribute("loginTime", java.time.LocalDateTime.now());
@@ -159,11 +162,11 @@ public class AuthController {
                     new com.campus.recruitment.portal.security.CustomUserDetailsService(userRepository).loadUserByUsername(email);
                 var auth = new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
                     userDetails, null, userDetails.getAuthorities());
-                org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(auth);
-                
-                request.getSession(true).setAttribute(
-                    org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, 
-                    org.springframework.security.core.context.SecurityContextHolder.getContext());
+                    
+                org.springframework.security.core.context.SecurityContext context = org.springframework.security.core.context.SecurityContextHolder.createEmptyContext();
+                context.setAuthentication(auth);
+                org.springframework.security.core.context.SecurityContextHolder.setContext(context);
+                securityContextRepository.saveContext(context, request, response);
                 
                 // Set session time
                 session.setAttribute("loginTime", java.time.LocalDateTime.now());
@@ -186,11 +189,11 @@ public class AuthController {
                     new com.campus.recruitment.portal.security.CustomUserDetailsService(userRepository).loadUserByUsername(email);
                 var auth = new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
                     userDetails, null, userDetails.getAuthorities());
-                org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(auth);
                 
-                request.getSession(true).setAttribute(
-                    org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, 
-                    org.springframework.security.core.context.SecurityContextHolder.getContext());
+                org.springframework.security.core.context.SecurityContext context = org.springframework.security.core.context.SecurityContextHolder.createEmptyContext();
+                context.setAuthentication(auth);
+                org.springframework.security.core.context.SecurityContextHolder.setContext(context);
+                securityContextRepository.saveContext(context, request, response);
                 
                 // Set session time
                 session.setAttribute("loginTime", java.time.LocalDateTime.now());

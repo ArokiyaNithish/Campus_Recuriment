@@ -28,8 +28,14 @@ public class SecurityConfig {
     }
 
     @Bean
+    public org.springframework.security.web.context.SecurityContextRepository securityContextRepository() {
+        return new org.springframework.security.web.context.HttpSessionSecurityContextRepository();
+    }
+
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+            .securityContext(context -> context.securityContextRepository(securityContextRepository()))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/auth/**", "/css/**", "/js/**", "/images/**",
                                  "/uploads/**", "/error", "/favicon.ico").permitAll()
@@ -57,5 +63,4 @@ public class SecurityConfig {
 
         return http.build();
     }
-
 }
