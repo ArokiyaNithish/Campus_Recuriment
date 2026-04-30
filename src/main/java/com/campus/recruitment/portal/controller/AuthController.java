@@ -69,8 +69,9 @@ public class AuthController {
                 userDetails, null, userDetails.getAuthorities());
             org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(auth);
             
-            new org.springframework.security.web.context.HttpSessionSecurityContextRepository().saveContext(
-                org.springframework.security.core.context.SecurityContextHolder.getContext(), request, response);
+            request.getSession(true).setAttribute(
+                org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, 
+                org.springframework.security.core.context.SecurityContextHolder.getContext());
             
             // Set session time
             session.setAttribute("loginTime", java.time.LocalDateTime.now());
@@ -160,8 +161,9 @@ public class AuthController {
                     userDetails, null, userDetails.getAuthorities());
                 org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(auth);
                 
-                new org.springframework.security.web.context.HttpSessionSecurityContextRepository().saveContext(
-                    org.springframework.security.core.context.SecurityContextHolder.getContext(), request, response);
+                request.getSession(true).setAttribute(
+                    org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, 
+                    org.springframework.security.core.context.SecurityContextHolder.getContext());
                 
                 // Set session time
                 session.setAttribute("loginTime", java.time.LocalDateTime.now());
@@ -186,8 +188,9 @@ public class AuthController {
                     userDetails, null, userDetails.getAuthorities());
                 org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(auth);
                 
-                new org.springframework.security.web.context.HttpSessionSecurityContextRepository().saveContext(
-                    org.springframework.security.core.context.SecurityContextHolder.getContext(), request, response);
+                request.getSession(true).setAttribute(
+                    org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, 
+                    org.springframework.security.core.context.SecurityContextHolder.getContext());
                 
                 // Set session time
                 session.setAttribute("loginTime", java.time.LocalDateTime.now());
