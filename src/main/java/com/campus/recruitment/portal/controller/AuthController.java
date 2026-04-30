@@ -78,7 +78,7 @@ public class AuthController {
             
             // Set session time
             session.setAttribute("loginTime", java.time.LocalDateTime.now());
-            session.setAttribute("sessionEndTime", java.time.LocalDateTime.now().plusMinutes(10));
+            session.setAttribute("sessionEndTime", java.time.Instant.now().plus(java.time.Duration.ofMinutes(10)).toString());
             
             if (user.getRole() == com.campus.recruitment.portal.model.User.Role.STUDENT) return "redirect:/student/dashboard";
             if (user.getRole() == com.campus.recruitment.portal.model.User.Role.EMPLOYER) return "redirect:/employer/dashboard";
@@ -170,7 +170,7 @@ public class AuthController {
                 
                 // Set session time
                 session.setAttribute("loginTime", java.time.LocalDateTime.now());
-                session.setAttribute("sessionEndTime", java.time.LocalDateTime.now().plusMinutes(10));
+                session.setAttribute("sessionEndTime", java.time.Instant.now().plus(java.time.Duration.ofMinutes(10)).toString());
                 
                 if ("STUDENT".equals(role)) return "redirect:/student/dashboard";
                 else return "redirect:/employer/dashboard";
@@ -197,7 +197,7 @@ public class AuthController {
                 
                 // Set session time
                 session.setAttribute("loginTime", java.time.LocalDateTime.now());
-                session.setAttribute("sessionEndTime", java.time.LocalDateTime.now().plusMinutes(10));
+                session.setAttribute("sessionEndTime", java.time.Instant.now().plus(java.time.Duration.ofMinutes(10)).toString());
                 
                 if (user.getRole() == com.campus.recruitment.portal.model.User.Role.STUDENT) return "redirect:/student/dashboard";
                 if (user.getRole() == com.campus.recruitment.portal.model.User.Role.EMPLOYER) return "redirect:/employer/dashboard";
