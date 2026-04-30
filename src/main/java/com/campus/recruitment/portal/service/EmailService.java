@@ -1,36 +1,51 @@
 package com.campus.recruitment.portal.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-
-import jakarta.mail.internet.MimeMessage;
+import org.springframework.web.client.RestTemplate;
+import java.util.Map;
+import java.util.List;
 
 @Service
 public class EmailService {
 
-    @Autowired(required = false)
-    private JavaMailSender mailSender;
-
-    @org.springframework.beans.factory.annotation.Value("${app.mail.from}")
+    @Value("${app.mail.from}")
     private String fromEmail;
+
+    @Value("${spring.mail.password}")
+    private String apiKey;
 
     @Async
     public void sendEmail(String to, String subject, String htmlBody) {
-        if (mailSender == null) return;
         try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-            helper.setFrom(fromEmail, "Campus Recruitment Portal");
-            helper.setTo(to);
-            helper.setSubject(subject);
-            helper.setText(htmlBody, true);
-            mailSender.send(message);
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("api-key", apiKey);
+            headers.set("Content-Type", "application/json");
+            headers.set("accept", "application/json");
+
+            Map<String, Object> body = Map.of(
+                "sender", Map.of("name", "Campus Recruitment Portal", "email", fromEmail),
+                "to", List.of(Map.of("email", to)),
+                "subject", subject,
+                "htmlContent", htmlBody
+            );
+
+            HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
+            ResponseEntity<String> response = restTemplate.exchange(
+                "https://api.brevo.com/v3/smtp/email",
+                HttpMethod.POST,
+                request,
+                String.class
+            );
+            System.out.println("Email sent successfully via Brevo HTTP API! Status: " + response.getStatusCode());
         } catch (Exception e) {
-            // Log but don't crash the app if email fails
-            System.err.println("Failed to send email to " + to + ": " + e.getMessage());
+            System.err.println("Failed to send email via Brevo HTTP API to " + to + ": " + e.getMessage());
         }
     }
 

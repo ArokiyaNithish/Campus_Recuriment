@@ -228,17 +228,10 @@ public class AuthController {
             org.springframework.context.ApplicationContext ctx = org.springframework.web.context.support.WebApplicationContextUtils
                 .getWebApplicationContext(session.getServletContext());
                 
-            org.springframework.mail.javamail.JavaMailSender mailSender = ctx.getBean(org.springframework.mail.javamail.JavaMailSender.class);
-            String from = ctx.getEnvironment().getProperty("app.mail.from", "test@example.com");
-                
-            jakarta.mail.internet.MimeMessage message = mailSender.createMimeMessage();
-            org.springframework.mail.javamail.MimeMessageHelper helper = new org.springframework.mail.javamail.MimeMessageHelper(message, true, "UTF-8");
-            helper.setFrom(from, "Campus Recruitment Portal");
-            helper.setTo(to);
-            helper.setSubject("Test Email");
-            helper.setText("This is a test email.", true);
-            mailSender.send(message);
-            return "SUCCESS: Email sent successfully to " + to;
+            com.campus.recruitment.portal.service.EmailService emailService = ctx.getBean(com.campus.recruitment.portal.service.EmailService.class);
+            emailService.sendEmail(to, "Test Email API", "This is a test email sent via Brevo HTTP API.");
+            
+            return "SUCCESS: Command to send email to " + to + " via Brevo HTTP API executed. Check background logs.";
         } catch (Exception e) {
             StringBuilder sb = new StringBuilder();
             sb.append("ERROR: ").append(e.getMessage()).append("<br><br>");
