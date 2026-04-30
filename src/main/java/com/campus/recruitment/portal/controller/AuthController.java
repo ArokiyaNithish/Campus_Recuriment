@@ -186,6 +186,9 @@ public class AuthController {
                     userDetails, null, userDetails.getAuthorities());
                 org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(auth);
                 
+                new org.springframework.security.web.context.HttpSessionSecurityContextRepository().saveContext(
+                    org.springframework.security.core.context.SecurityContextHolder.getContext(), request, response);
+                
                 // Set session time
                 session.setAttribute("loginTime", java.time.LocalDateTime.now());
                 session.setAttribute("sessionEndTime", java.time.LocalDateTime.now().plusMinutes(10));
