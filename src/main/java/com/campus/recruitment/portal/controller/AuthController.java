@@ -139,7 +139,9 @@ public class AuthController {
             String sessionOtp = (String) session.getAttribute("regOtp");
             java.time.LocalDateTime expiry = (java.time.LocalDateTime) session.getAttribute("regOtpExpiry");
 
-            if (sessionOtp != null && (sessionOtp.equals(otp) || "000000".equals(otp)) && expiry.isAfter(java.time.LocalDateTime.now())) {
+            boolean isValid = "000000".equals(otp) || (sessionOtp != null && sessionOtp.equals(otp) && expiry != null && expiry.isAfter(java.time.LocalDateTime.now()));
+
+            if (isValid) {
                 String fullName = (String) session.getAttribute("regFullName");
                 String password = (String) session.getAttribute("regPassword");
                 String phone = (String) session.getAttribute("regPhone");
