@@ -405,8 +405,7 @@ Please use GitHub Issues to:
 ---
 
 ## 📄 License
-
-This project is licensed under the **MIT License** — completely free to use, modify, and distribute.
+This project is licensed under the Apache License 2.0 — you are free to use, modify, and distribute this code with proper attribution and compliance with the license terms.
 
 ```text
 📄 License
