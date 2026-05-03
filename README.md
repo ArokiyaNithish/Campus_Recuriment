@@ -9,7 +9,7 @@
 [![Thymeleaf](https://img.shields.io/badge/Thymeleaf-HTML5-green?style=for-the-badge&logo=thymeleaf)](https://www.thymeleaf.org/)
 [![MySQL](https://img.shields.io/badge/MySQL-Database-blue?style=for-the-badge&logo=mysql)](https://www.mysql.com/)
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-Railway-purple?style=for-the-badge&logo=railway)](https://campusrecuriment-production.up.railway.app/auth/login?logout=true)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue?logo=apache&style=for-the-badge)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-brightgreen?style=for-the-badge)](CONTRIBUTING.md)
 
 > 🚀 **A comprehensive, real-world recruitment solution** designed to digitalize and streamline the placement process within educational institutions. By providing a centralized platform for Students, Employers, and Administrators, the system bridges the gap between academic talent and industry opportunities.
@@ -409,27 +409,29 @@ Please use GitHub Issues to:
 This project is licensed under the **MIT License** — completely free to use, modify, and distribute.
 
 ```text
-MIT License
+📄 License
+This project is licensed under the Apache License 2.0 — you are free to use, modify, and distribute this code with proper attribution and compliance with the license terms.
+
+Apache License
+Version 2.0, January 2004
+http://www.apache.org/licenses/
 
 Copyright (c) 2026 Arokiya Nithish J
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+```
+http://www.apache.org/licenses/LICENSE-2.0  
+```
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
 ```
 
 See [LICENSE](LICENSE) for full details.
@@ -473,3 +475,69 @@ For support, email arokiyanithishj@gmail.com or open an issue on GitHub.
 *© 2026 — Arokiya Nithish J*
 
 </div>
+
+
+```
+NOTICE
+
+Project Name: Campus Recruitment Portal
+Copyright (c) 2026 Arokiya Nithish J
+
+This product includes software developed by Arokiya Nithish J.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+---
+
+Third-Party Attributions
+
+This project may include or depend on third-party libraries.
+Attributions and licenses for those components are listed below:
+
+* Spring Boot — Copyright (c) 2012-2026 Pivotal, Inc. / VMware, Inc.
+  Licensed under Apache License 2.0
+  Source: https://github.com/spring-projects/spring-boot
+
+* Spring Security — Copyright (c) 2004-2026 Acegi Technology Pty Limited
+  Licensed under Apache License 2.0
+  Source: https://github.com/spring-projects/spring-security
+
+* Hibernate ORM — Copyright (c) 2006-2026 Red Hat, Inc.
+  Licensed under GNU Lesser General Public License v2.1
+  Source: https://github.com/hibernate/hibernate-orm
+
+* MySQL Connector/J — Copyright (c) 2020-2026 Oracle Corporation
+  Licensed under GNU General Public License v2.0 with FOSS Exception
+  Source: https://github.com/mysql/mysql-connector-j
+
+* Thymeleaf — Copyright (c) 2011-2026 The Thymeleaf Team
+  Licensed under Apache License 2.0
+  Source: https://github.com/thymeleaf/thymeleaf
+
+* Lombok — Copyright (c) 2009-2026 The Project Lombok Authors
+  Licensed under MIT License
+  Source: https://github.com/projectlombok/lombok
+
+---
+
+Modifications
+
+If you have modified this project, you should add a statement here such as:
+
+"This project has been modified by <Your Name/Organization> on <Date>.
+Changes include: <brief description of changes>"
+
+---
+
+END OF NOTICE
+```
