@@ -444,8 +444,8 @@ See [LICENSE](LICENSE) for full details.
 
 **Arokiya Nithish J**
 - Role: Full Stack Java Developer
-- 📅 Year: 2024 / 2026
-- 🎓 Engineering Student
+- 📅 Year: 2026
+- 🎓 Engineering Student (B.Tech AI&DS)
 - 💼 Domain: Java | Spring Boot | Web Development
 
 **Contacts**
