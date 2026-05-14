@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🎓 Campus Recruitment Portal 
+# 🎓 Campus Recruitment Portal App
 
 ### *AI-Enhanced Full-Stack Web Application for Streamlined College Placements*
 
