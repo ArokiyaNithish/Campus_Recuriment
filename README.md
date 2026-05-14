@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🎓 Campus Recruitment Portal
+# 🎓 Campus Recruitment Portal 
 
 ### *AI-Enhanced Full-Stack Web Application for Streamlined College Placements*
 
@@ -460,22 +460,6 @@ See [LICENSE](LICENSE) for full details.
 - 🚉 **Railway.app** — For seamless production deployment.
 
 ---
-
-<div align="center">
-
-For support, email arokiyanithishj@gmail.com or open an issue on GitHub.
-
-### 🌟 If this project helped you — please give it a ⭐ Star on GitHub!
-
-**#Java #SpringBoot #Recruitment #WebDevelopment #OpenSource**
-
-*Made with ❤️ by Arokiya Nithish*
-
-*© 2026 — Arokiya Nithish J*
-
-</div>
-
-
 ```
 NOTICE
 
@@ -540,3 +524,20 @@ Changes include: <brief description of changes>"
 
 END OF NOTICE
 ```
+---
+<div align="center">
+
+For support, email arokiyanithishj@gmail.com or open an issue on GitHub.
+
+### 🌟 If this project helped you — please give it a ⭐ Star on GitHub!
+
+**#Java #SpringBoot #Recruitment #WebDevelopment #OpenSource**
+
+*Made with ❤️ by Arokiya Nithish*
+
+*© 2026 — Arokiya Nithish J*
+
+</div>
+
+
+
