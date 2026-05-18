@@ -1,8 +1,8 @@
 <div align="center">
 
-# 🎓 Campus Recruitment Portal App
+# 🎓 Campus Recruitment Portal App.
 
-### *AI-Enhanced Full-Stack Web Application for Streamlined College Placements*
+### *AI-Enhanced Full-Stack Web Application for Streamlined College Placements.*
 
 [![Java](https://img.shields.io/badge/Java-17-orange?style=for-the-badge&logo=java)](https://www.java.com/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.5-brightgreen?style=for-the-badge&logo=springboot)](https://spring.io/projects/spring-boot)
